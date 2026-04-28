@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Casino</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" th:href="@{/estilos/estilosHome.css}">
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <div class="games-grid">
+        <a th:href="@{/games/blackjack}" class="game-item">
+            <img th:src="@{/img/bj.jpg}" alt="Blackjack">
+            <div class="game-label">Blackjack</div>
+        </a>
+
+        <a th:href="@{/games/roulette}" class="game-item">
+            <img th:src="@{/img/ruleta.jpg}" alt="Ruleta">
+            <div class="game-label">Ruleta</div>
+        </a>
+
+        <a th:href="@{/games/slots}" class="game-item">
+            <img th:src="@{/img/slots.jpg}" alt="Slots">
+            <div class="game-label">Slots</div>
+        </a>
+
+        <a th:href="@{/games/plinko}" class="game-item">
+            <img th:src="@{/img/plinko.jpg}" alt="Plinko">
+            <div class="game-label">Plinko</div>
+        </a>
+    </div>
+    
+    <!-- <div th:replace="~{fragments/footer :: bottombar}"></div> -->
+
+    <script th:src="@{/scripts/dropdownMenus.js}"></script>
+</body>
+
+</html>

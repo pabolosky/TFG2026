@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLOTS — Casino</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #F5C842; --gold-dark: #C9982A; --bg: #0a0a0f;
+            --surface: #13131c; --surface2: #1c1c2a; --border: #2a2a3d;
+            --text: #f0eee8; --muted: #7a7890; --red: #e84040; --green: #3ecf72;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        .top-bar { width: 100%; height: 100px; background: #000; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-bottom: 1px solid var(--border); }
+        .nav-title { font-family: 'Bebas Neue', sans-serif; color: var(--gold); font-size: 32px; letter-spacing: 4px; }
+        
+        .page { display: flex; flex-direction: column; align-items: center; padding: 48px 24px; gap: 32px; }
+        .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 6px; color: var(--gold); }
+
+        /* SALDO */
+        .saldo-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 99px; padding: 10px 24px; display: flex; align-items: center; gap: 10px; transition: all 0.3s; }
+        .saldo-chip strong { font-size: 22px; color: var(--gold); }
+        .bump { animation: bumpAnim 0.4s ease; }
+        @keyframes bumpAnim { 0% {transform: scale(1)} 50% {transform: scale(1.15)} 100% {transform: scale(1)} }
+
+        /* MÁQUINA */
+        .machine { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px; width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 32px; align-items: center; }
+        .reels { display: flex; gap: 16px; }
+        .reel-wrap { width: 110px; height: 110px; background: var(--bg); border: 2px solid var(--border); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 56px; }
+        .reel-wrap.spinning { border-color: var(--gold); opacity: 0.7; }
+        .reel-wrap.win { border-color: var(--green); box-shadow: 0 0 20px var(--green); }
+
+        .bet-display { background: var(--surface2); border: 1px solid var(--border); padding: 10px; border-radius: 10px; color: var(--gold); font-family: 'Bebas Neue'; font-size: 20px; min-width: 80px; text-align: center; }
+        .spin-btn { width: 100%; padding: 16px; background: var(--gold); border: none; border-radius: 14px; font-family: 'Bebas Neue'; font-size: 24px; cursor: pointer; transition: 0.2s; }
+        .spin-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+        .result-msg { padding: 12px; border-radius: 10px; font-weight: bold; text-align: center; min-height: 45px; width: 100%; display: none; }
+        .result-msg.show { display: block; }
+        .ganaste { background: rgba(62, 207, 114, 0.2); color: var(--green); border: 1px solid var(--green); }
+        .perdiste { background: rgba(232, 64, 64, 0.2); color: var(--red); border: 1px solid var(--red); }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="logo"><a th:href="@{/}"><span class="nav-title">🎰 CASINO</span></a></div>
+        <div class="saldo-chip" id="saldo-chip">
+            💰 SALDO ACTUAL: <strong><span id="saldo-val">0</span> €</strong>
+        </div>
+    </div>
+
+    <div class="page">
+        <h1 class="page-title">Lucky Slots</h1>
+
+        <div class="machine">
+            <div class="reels">
+                <div class="reel-wrap" id="reel0"><span id="r0">?</span></div>
+                <div class="reel-wrap" id="reel1"><span id="r1">?</span></div>
+                <div class="reel-wrap" id="reel2"><span id="r2">?</span></div>
+            </div>
+
+            <div id="result-msg" class="result-msg"></div>
+
+            <div style="width:100%">
+                <p style="color:var(--muted); margin-bottom:10px; font-size:12px; text-transform:uppercase">Tu Apuesta</p>
+                <div style="display:flex; gap:10px; align-items:center">
+                    <input type="range" id="slider-apuesta" min="10" max="1000" step="10" value="50" style="flex:1" oninput="setApuesta(this.value)">
+                    <div class="bet-display" id="display-apuesta">50 €</div>
+                </div>
+            </div>
+
+            <button class="spin-btn" id="spin-btn" onclick="girar()">GIRAR AHORA</button>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        let saldo = [[${saldo}]]; // Captura el saldo que envía el controlador
+        let apuesta = 50;
+        let girando = false;
+        const simbolos = ['🍒', '🍋', '🔔', '⭐', '💎'];
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            setSaldo(saldo);
+            setApuesta(50);
+        });
+
+        function setSaldo(val) {
+            saldo = parseInt(val);
+            document.getElementById('saldo-val').textContent = saldo;
+            
+            // Animación visual de cambio de saldo
+            const chip = document.getElementById('saldo-chip');
+            chip.classList.remove('bump');
+            void chip.offsetWidth; // Trigger reflow
+            chip.classList.add('bump');
+            
+            actualizarBotones();
+        }
+
+        function setApuesta(val) {
+            apuesta = parseInt(val);
+            document.getElementById('display-apuesta').textContent = apuesta + ' €';
+            actualizarBotones();
+        }
+
+        function actualizarBotones() {
+            const btn = document.getElementById('spin-btn');
+            btn.disabled = girando || saldo < apuesta;
+        }
+
+        function girar() {
+            if (girando || saldo < apuesta) return;
+            girando = true;
+            actualizarBotones();
+
+            // Limpiar mensaje y estados anteriores
+            const msg = document.getElementById('result-msg');
+            msg.className = 'result-msg';
+            msg.textContent = '';
+            document.querySelectorAll('.reel-wrap').forEach(r => {
+                r.classList.add('spinning');
+                r.classList.remove('win');
+            });
+
+            // Animación local rápida antes de recibir la respuesta
+            const interval = setInterval(() => {
+                document.getElementById('r0').textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+                document.getElementById('r1').textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+                document.getElementById('r2').textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+            }, 100);
+
+            // Llamada al servidor
+            fetch('/games/slots/spin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.content || ''
+                },
+                body: 'apuesta=' + apuesta
+            })
+            .then(res => res.json())
+            .then(data => {
+                clearInterval(interval);
+                document.querySelectorAll('.reel-wrap').forEach(r => r.classList.remove('spinning'));
+
+                if (data.ok) {
+                    // 1. Mostrar resultado real del servidor
+                    document.getElementById('r0').textContent = data.resultado[0];
+                    document.getElementById('r1').textContent = data.resultado[1];
+                    document.getElementById('r2').textContent = data.resultado[2];
+
+                    // 2. ACTUALIZAR SALDO (Muy importante: usamos el valor real de la BD)
+                    setSaldo(data.saldo);
+
+                    // 3. Mostrar mensaje de premio o pérdida
+                    msg.classList.add('show');
+                    if (data.premio > 0) {
+                        msg.textContent = `¡GANASTE! +${data.premio} €`;
+                        msg.classList.add('ganaste');
+                        document.querySelectorAll('.reel-wrap').forEach(r => r.classList.add('win'));
+                    } else {
+                        msg.textContent = `PERDISTE. -${apuesta} €`;
+                        msg.classList.add('perdiste');
+                    }
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(err => {
+                clearInterval(interval);
+                alert("Error de conexión con el casino.");
+            })
+            .finally(() => {
+                girando = false;
+                actualizarBotones();
+            });
+        }
+    </script>
+
+    <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+</body>
+</html>

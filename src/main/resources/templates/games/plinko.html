@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLINKO — Casino</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #F5C842; --gold-dark: #C9982A; --bg: #0a0a0f;
+            --surface: #13131c; --surface2: #1c1c2a; --border: #2a2a3d;
+            --text: #f0eee8; --muted: #7a7890; --red: #e84040; --green: #3ecf72;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        .top-bar { width: 100%; height: 100px; background: #000; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-bottom: 1px solid var(--border); }
+        .nav-title { font-family: 'Bebas Neue', sans-serif; color: var(--gold); font-size: 32px; letter-spacing: 4px; }
+        .saldo-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 99px; padding: 10px 24px; display: flex; align-items: center; gap: 10px; }
+        .saldo-chip strong { font-size: 22px; color: var(--gold); }
+        .bump { animation: bumpAnim 0.4s ease; }
+        @keyframes bumpAnim { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
+        .page { display: flex; flex-direction: column; align-items: center; padding: 48px 24px; gap: 32px; }
+        .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 6px; color: var(--gold); }
+        .machine { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px; width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 24px; align-items: center; }
+        canvas { border-radius: 14px; border: 1px solid var(--border); background: var(--bg); display: block; }
+        .multipliers { display: flex; gap: 6px; width: 100%; }
+        .mult-box { flex: 1; text-align: center; padding: 8px 2px; border-radius: 8px; font-family: 'Bebas Neue', sans-serif; font-size: 14px; border: 1px solid; transition: transform 0.2s, box-shadow 0.2s; }
+        .bet-display { background: var(--surface2); border: 1px solid var(--border); padding: 10px; border-radius: 10px; color: var(--gold); font-family: 'Bebas Neue', sans-serif; font-size: 20px; min-width: 80px; text-align: center; }
+        .spin-btn { width: 100%; padding: 16px; background: var(--gold); border: none; border-radius: 14px; font-family: 'Bebas Neue', sans-serif; font-size: 24px; cursor: pointer; transition: 0.2s; }
+        .spin-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+        .result-msg { padding: 12px; border-radius: 10px; font-weight: bold; text-align: center; min-height: 45px; width: 100%; display: none; }
+        .result-msg.show { display: block; }
+        .ganaste { background: rgba(62,207,114,0.2); color: var(--green); border: 1px solid var(--green); }
+        .perdiste { background: rgba(232,64,64,0.2); color: var(--red); border: 1px solid var(--red); }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo"><a th:href="@{/}"><span class="nav-title">🎰 CASINO</span></a></div>
+        <div class="saldo-chip" id="saldo-chip">
+            💰 SALDO ACTUAL: <strong><span id="saldo-val">0</span> €</strong>
+        </div>
+    </div>
+
+    <div class="page">
+        <h1 class="page-title">Plinko</h1>
+        <div class="machine">
+            <canvas id="plinko-canvas" width="440" height="340"></canvas>
+            <div class="multipliers" id="mult-boxes"></div>
+            <div id="result-msg" class="result-msg"></div>
+            <div style="width:100%">
+                <p style="color:var(--muted); margin-bottom:10px; font-size:12px; text-transform:uppercase">Tu Apuesta</p>
+                <div style="display:flex; gap:10px; align-items:center">
+                    <input type="range" id="slider-apuesta" min="10" max="1000" step="10" value="50" style="flex:1" oninput="setApuesta(this.value)">
+                    <div class="bet-display" id="display-apuesta">50 €</div>
+                </div>
+            </div>
+            <button class="spin-btn" id="drop-btn" onclick="soltar()">SOLTAR BOLA</button>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        let saldo = [[${saldo}]];
+        let apuesta = 50;
+        let cayendo = false;
+
+        const MULTIPLIERS = [10, 3, 1.5, 0.5, 0.3, 0.5, 1.5, 3, 10];
+        const MULT_COLORS = [
+            {bg:'rgba(62,207,114,0.25)',border:'#3ecf72',text:'#3ecf72'},
+            {bg:'rgba(245,200,66,0.2)',border:'#F5C842',text:'#F5C842'},
+            {bg:'rgba(245,200,66,0.15)',border:'#C9982A',text:'#C9982A'},
+            {bg:'rgba(232,64,64,0.15)',border:'#e84040',text:'#e84040'},
+            {bg:'rgba(122,120,144,0.2)',border:'#7a7890',text:'#7a7890'},
+            {bg:'rgba(232,64,64,0.15)',border:'#e84040',text:'#e84040'},
+            {bg:'rgba(245,200,66,0.15)',border:'#C9982A',text:'#C9982A'},
+            {bg:'rgba(245,200,66,0.2)',border:'#F5C842',text:'#F5C842'},
+            {bg:'rgba(62,207,114,0.25)',border:'#3ecf72',text:'#3ecf72'},
+        ];
+
+        const COLS = 9, ROWS = 8;
+        const canvas = document.getElementById('plinko-canvas');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        const padX = 44, padY = 32;
+        const cellW = (W - padX*2) / (COLS - 1);
+        const cellH = (H - padY*2 - 50) / (ROWS - 1);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setSaldo(saldo);
+            setApuesta(50);
+            buildMults();
+            drawBoard(null, undefined);
+        });
+
+        function buildMults() {
+            const box = document.getElementById('mult-boxes');
+            box.innerHTML = '';
+            MULTIPLIERS.forEach((m, i) => {
+                const c = MULT_COLORS[i];
+                const d = document.createElement('div');
+                d.className = 'mult-box';
+                d.id = 'mult-' + i;
+                d.style.background = c.bg;
+                d.style.borderColor = c.border;
+                d.style.color = c.text;
+                d.textContent = m + 'x';
+                box.appendChild(d);
+            });
+        }
+
+        function pinPosition(row, col) {
+            const count = row + 2;
+            const startX = padX + (COLS - 1 - (count - 1)) * cellW / 2;
+            return { x: startX + col * cellW, y: padY + row * cellH };
+        }
+
+        function drawBoard(ball, highlightSlot) {
+            ctx.clearRect(0, 0, W, H);
+            for (let row = 0; row < ROWS; row++) {
+                const count = row + 2;
+                for (let col = 0; col < count; col++) {
+                    const p = pinPosition(row, col);
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = '#2a2a3d';
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = '#7a7890';
+                    ctx.fill();
+                }
+            }
+            if (highlightSlot !== undefined) {
+                const slotW = (W - padX * 2) / COLS;
+                const sx = padX + highlightSlot * slotW;
+                const sy = H - 50;
+                ctx.fillStyle = MULT_COLORS[highlightSlot].border + '44';
+                ctx.roundRect(sx, sy - 8, slotW, 48, 6);
+                ctx.fill();
+            }
+            if (ball) {
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, 11, 0, Math.PI * 2);
+                ctx.fillStyle = '#F5C842';
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(ball.x - 3, ball.y - 3, 4, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.fill();
+            }
+        }
+
+       function animateBall(finalSlot, onDone) {
+    // Reconstruir el camino binomial que lleva al finalSlot
+    // finalSlot = número de veces que fue a la derecha (0-8)
+    let rights = finalSlot; // cuántas veces va a la derecha
+    let lefts = 8 - finalSlot;
+
+    // Mezclar aleatoriamente los pasos para que la animación varíe
+    let steps = Array(rights).fill(1).concat(Array(lefts).fill(0));
+    for (let i = steps.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [steps[i], steps[j]] = [steps[j], steps[i]];
+    }
+
+    let path = [{ x: W / 2, y: padY - 24 }];
+    let col = 0; // columna dentro de la fila actual (empieza en el pin izquierdo de cada fila)
+
+    for (let row = 0; row < ROWS; row++) {
+        const goRight = steps[row] === 1;
+        const p = pinPosition(row, col);
+
+        // Punto de rebote en el pin
+        path.push({ x: p.x, y: p.y });
+
+        // Mover columna para la siguiente fila
+        if (goRight) col++;
+        // col no cambia si va a la izquierda
+    }
+
+    // Destino final: centro del slot
+    const slotW = (W - padX * 2) / COLS;
+    path.push({ x: padX + finalSlot * slotW + slotW / 2, y: H - 28 });
+
+    let step = 0, sub = 0;
+    const stepsPerSeg = 18;
+
+    function frame() {
+        if (step >= path.length - 1) { onDone(); return; }
+        sub++;
+        const t = sub / stepsPerSeg;
+        const from = path[step], to = path[step + 1];
+
+        // Easing suave + pequeño arco lateral para simular rebote
+        const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+        const arc = Math.sin(Math.PI * t) * 8;
+        const ball = {
+            x: from.x + (to.x - from.x) * ease + arc * (to.x > from.x ? 1 : -1),
+            y: from.y + (to.y - from.y) * ease
+        };
+
+        drawBoard(ball, step >= path.length - 2 ? finalSlot : undefined);
+        if (sub >= stepsPerSeg) { step++; sub = 0; }
+        requestAnimationFrame(frame);
+    }
+    frame();
+}
+
+        function setSaldo(val) {
+            saldo = parseInt(val);
+            document.getElementById('saldo-val').textContent = saldo;
+            const chip = document.getElementById('saldo-chip');
+            chip.classList.remove('bump');
+            void chip.offsetWidth;
+            chip.classList.add('bump');
+            actualizarBoton();
+        }
+
+        function setApuesta(val) {
+            apuesta = parseInt(val);
+            document.getElementById('display-apuesta').textContent = apuesta + ' €';
+            actualizarBoton();
+        }
+
+        function actualizarBoton() {
+            document.getElementById('drop-btn').disabled = cayendo || saldo < apuesta;
+        }
+
+        function soltar() {
+            if (cayendo || saldo < apuesta) return;
+            cayendo = true;
+            actualizarBoton();
+
+            const msg = document.getElementById('result-msg');
+            msg.className = 'result-msg';
+            msg.textContent = '';
+            document.querySelectorAll('.mult-box').forEach(b => {
+                b.style.transform = '';
+                b.style.boxShadow = '';
+            });
+
+            fetch('/games/plinko/drop', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.content || ''
+                },
+                body: 'apuesta=' + apuesta
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.ok) { alert('Error: ' + data.error); cayendo = false; actualizarBoton(); return; }
+
+                animateBall(data.slot, () => {
+                    const box = document.getElementById('mult-' + data.slot);
+                    box.style.transform = 'scale(1.2)';
+                    box.style.boxShadow = '0 0 16px ' + MULT_COLORS[data.slot].border;
+                    setTimeout(() => { box.style.transform = ''; box.style.boxShadow = ''; }, 1200);
+
+                    setSaldo(data.saldo);
+                    msg.classList.add('show');
+                    if (data.premio > 0) {
+                        msg.textContent = `¡GANASTE! +${data.premio} €  (×${MULTIPLIERS[data.slot]})`;
+                        msg.classList.add('ganaste');
+                    } else {
+                        msg.textContent = `PERDISTE. ${data.premio} €`;
+                        msg.classList.add('perdiste');
+                    }
+                    cayendo = false;
+                    actualizarBoton();
+                });
+            })
+            .catch(() => {
+                alert('Error de conexión con el casino.');
+                cayendo = false;
+                actualizarBoton();
+            });
+        }
+    </script>
+
+    <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+</body>
+</html>

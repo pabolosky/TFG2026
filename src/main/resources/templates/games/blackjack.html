@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Casino - Blackjack Pro</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0a0a0a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* La Mesa de Juego */
+        .blackjack-table {
+            background: radial-gradient(circle, #1a5e20 0%, #0d3311 100%);
+            border: 15px solid #3e2723; /* Borde de madera */
+            border-radius: 50% / 10% 10% 40% 40%; /* Forma semicircular de mesa */
+            min-height: 80vh;
+            margin-top: 20px;
+            padding: 40px;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.5), 0 20px 50px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        /* Contenedor de Cartas */
+        .hand-container {
+            display: flex;
+            justify-content: center;
+            min-height: 160px;
+            margin-bottom: 20px;
+        }
+
+        .playing-card {
+            width: 100px;
+            height: 145px;
+            margin-left: -40px; /* Superposición para efecto abanico */
+            transition: transform 0.3s ease, margin 0.3s ease;
+            filter: drop-shadow(2px 5px 5px rgba(0,0,0,0.4));
+        }
+
+        .playing-card:first-child { margin-left: 0; }
+        
+        .playing-card:hover {
+            transform: translateY(-10px) rotate(2deg);
+            z-index: 100;
+        }
+
+        .playing-card img {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        /* Etiquetas de puntuación */
+        .score-badge {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .controls {
+            margin-top: 30px;
+        }
+
+        .btn-action {
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body class="text-white">
+
+    <div class="container-fluid bg-black py-2 px-4 d-flex justify-content-between align-items-center">
+        <span class="fs-4 fw-bold text-danger">{NOMBRE CASINO}</span>
+        <span class="badge bg-warning text-dark fs-6">Balance: [[${money}]]€</span>
+    </div>
+
+    <div class="container mt-4">
+        <div class="blackjack-table text-center">
+            
+            <div class="mb-5">
+                <h4 class="text-uppercase opacity-75">Dealer</h4>
+                <div class="hand-container">
+                    <div th:each="card, iter : ${game.dealerHand}" class="playing-card">
+                        <img th:if="${!game.gameOver && iter.index == 1}" 
+                             th:src="@{/img/cards/back.png}" alt="Reverso">
+                        
+                        <img th:unless="${!game.gameOver && iter.index == 1}" 
+                             th:src="@{'/img/cards/' + ${card.rank} + '_' + ${card.suit} + '.png'}" 
+                             th:alt="${card.rank + ' ' + card.suit}">
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${game.gameOver}" class="my-4 animate__animated animate__fadeInDown">
+                <h1 class="display-4 fw-bold text-warning" th:text="${game.message}"></h1>
+                <a th:href="@{/games/blackjack}" class="btn btn-primary btn-lg mt-2 shadow">Jugar otra vez</a>
+            </div>
+
+            <div class="mt-5">
+                <div class="hand-container">
+                    <div th:each="card : ${game.playerHand}" class="playing-card">
+                        <img th:src="@{'/img/cards/' + ${card.rank} + '_' + ${card.suit} + '.png'}" 
+                             th:alt="${card.rank + ' ' + card.suit}">
+                    </div>
+                </div>
+                <div class="score-badge">PUNTOS: <span th:text="${playerScore}"></span></div>
+                <h4 class="mt-2 text-uppercase fw-bold">[[${username}]]</h4>
+            </div>
+
+            <div th:if="${!game.gameOver}" class="controls">
+                <form th:action="@{/games/blackjack/hit}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-warning btn-lg btn-action mx-2 shadow">
+                        <span class="material-icons align-middle">add_circle</span> Pedir
+                    </button>
+                </form>
+                <form th:action="@{/games/blackjack/stand}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger btn-lg btn-action mx-2 shadow">
+                        <span class="material-icons align-middle">back_hand</span> Plantarse
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
