@@ -8,137 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --casino-black: #0f0f0f;
-            --casino-dark-grey: #1a1a1a;
-            --casino-red: #e6192e;
-            --casino-gold: #ffc107;
-        }
-
-        body {
-            color: white;
-            font-family: 'Montserrat', sans-serif;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .betting-card {
-            background-color: var(--casino-dark-grey);
-            border-top: 4px solid var(--casino-red);
-            border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            padding: 2.5rem;
-            max-width: 450px;
-            width: 90%;
-            margin-top: 50px;
-        }
-
-        .balance-box {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 193, 7, 0.3);
-            margin-bottom: 25px;
-        }
-
-        .gold-text {
-            color: var(--casino-gold);
-            font-weight: 700;
-            text-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
-        }
-
-        .input-group-custom {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .input-group-custom .material-symbols-outlined {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-            z-index: 5;
-        }
-
-        .form-control-custom {
-            background-color: #2b2b2b;
-            border: 1px solid #444;
-            color: white;
-            padding: 12px 12px 12px 45px;
-            border-radius: 6px;
-            width: 100%;
-            transition: 0.3s;
-        }
-
-        .form-control-custom:focus {
-            border-color: var(--casino-red);
-            background-color: #333;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(230, 25, 46, 0.2);
-        }
-
-        .btn-deal {
-            background: linear-gradient(135deg, var(--casino-red) 0%, #a31120 100%);
-            border: none;
-            color: white;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 15px;
-            letter-spacing: 1px;
-            transition: 0.3s;
-            border-radius: 6px;
-        }
-
-        .btn-deal:hover {
-            transform: scale(1.02);
-            box-shadow: 0 5px 15px rgba(230, 25, 46, 0.4);
-            filter: brightness(1.1);
-        }
-
-        /* Icono decorativo de fondo */
-        .bg-icon {
-            position: absolute;
-            bottom: -20px;
-            right: -20px;
-            font-size: 120px;
-            color: rgba(255, 255, 255, 0.03);
-            pointer-events: none;
-        }
-
-        .bet-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .bet-btn {
-            flex: 1;
-            min-width: 60px;
-            padding: 10px;
-            background: #2b2b2b;
-            border: 1px solid #444;
-            color: white;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-        }
-
-        .bet-btn:hover {
-            background: var(--casino-red);
-            border-color: var(--casino-red);
-            box-shadow: 0 0 10px rgba(230, 25, 46, 0.4);
-        }
-
-        .bet-btn.active {
-            background: var(--casino-gold);
-            color: black;
-            border-color: var(--casino-gold);
-            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/estilos/estilosBJIndex.css}">
 </head>
 
 <body th:style="'background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url(' + @{/img/bg.jpg} + ') no-repeat center center fixed; background-size: cover;'">
@@ -215,11 +85,7 @@
             buttons.forEach(btn => {
                 btn.addEventListener("click", function () {
                     const value = this.dataset.value;
-
-                    // Actualiza valor
                     betInput.value = value;
-
-                    // Marcar activo
                     buttons.forEach(b => b.classList.remove("active"));
                     this.classList.add("active");
                 });

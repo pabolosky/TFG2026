@@ -18,11 +18,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.casino.model.Statuses;
 import com.casino.model.User;
 import com.casino.services.UsersService;
-import com.example.demo.model.dept;
+
 
 import jakarta.servlet.http.HttpServletRequest; 
 

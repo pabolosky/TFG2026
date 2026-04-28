@@ -38,6 +38,9 @@ public class gamesController {
     private rouletteService rouletteService;
 	
 	@Autowired
+	private UsersService userService;
+	
+	@Autowired
 	private UsersRepository userRepository;
 	
 	@Autowired
@@ -52,7 +55,17 @@ public class gamesController {
 
 
 	@GetMapping("/poker")
-	public String mostrarPoker(Model model) {
+	public String mostrarPoker(Model model, Principal principal) {
+		
+		 if (principal != null) { 
+		        model.addAttribute("username", principal.getName());
+		        model.addAttribute("isLoggedIn", true);
+		    } else {  
+		        model.addAttribute("isLoggedIn", false);
+		    }
+			
+		 User user = userService.SearchByUsername(principal.getName());
+	        model.addAttribute("userStatus", user.getUserStatus());
 		
 		return "games/poker";
 	}
@@ -60,7 +73,17 @@ public class gamesController {
 /******************************************************ROULETTE**********************************************************/	
 	
 	@GetMapping("/roulette")
-	public String mostrarRuleta(Model model) {
+	public String mostrarRuleta(Model model, Principal principal) {
+		
+		 if (principal != null) { 
+		        model.addAttribute("username", principal.getName());
+		        model.addAttribute("isLoggedIn", true);
+		    } else {  
+		        model.addAttribute("isLoggedIn", false);
+		    }
+			
+		 User user = userService.SearchByUsername(principal.getName());
+	        model.addAttribute("userStatus", user.getUserStatus());
 		 
 		return "games/roulette";  
 	}
@@ -75,9 +98,20 @@ public class gamesController {
 /********************************************************SLOTS********************************************************/
 	
 	@GetMapping("/slots")
-    public String mostrarSlots(Model model) {
-        User user = slotsService.obtenerUsuarioAutenticado();
-        model.addAttribute("saldo", (user != null) ? user.getUserMoney() : 0);
+    public String mostrarSlots(Model model, Principal principal) {
+        User userA = slotsService.obtenerUsuarioAutenticado();
+        model.addAttribute("saldo", (userA != null) ? userA.getUserMoney() : 0);
+        
+        if (principal != null) { 
+	        model.addAttribute("username", principal.getName());
+	        model.addAttribute("isLoggedIn", true);
+	    } else {  
+	        model.addAttribute("isLoggedIn", false);
+	    }
+		
+        User user = userService.SearchByUsername(principal.getName());
+        model.addAttribute("userStatus", user.getUserStatus());
+        
         return "games/slots";
     }
 
@@ -105,9 +139,20 @@ public class gamesController {
 	
 
     @GetMapping("/plinko")
-    public String mostrarPlinko(Model model) {
-        User user = plinkoService.obtenerUsuarioAutenticado();
-        model.addAttribute("saldo", (user != null) ? user.getUserMoney() : 0);
+    public String mostrarPlinko(Model model, Principal principal) {
+        User userA = plinkoService.obtenerUsuarioAutenticado();
+        model.addAttribute("saldo", (userA != null) ? userA.getUserMoney() : 0);
+        
+        if (principal != null) { 
+	        model.addAttribute("username", principal.getName());
+	        model.addAttribute("isLoggedIn", true);
+	    } else {  
+	        model.addAttribute("isLoggedIn", false);
+	    }
+		
+        User user = userService.SearchByUsername(principal.getName());
+        model.addAttribute("userStatus", user.getUserStatus());
+        
         return "games/plinko";
     }
 
@@ -131,8 +176,19 @@ public class gamesController {
 /**************************************************BLACKJACK**************************************************************/	
     @GetMapping("/blackjack")
     public String blackjackIndex(Model model, Principal principal) {
-        User user = userRepository.findByUsername(principal.getName());
-        model.addAttribute("money", user.getUserMoney());
+        User userN = userRepository.findByUsername(principal.getName());
+        model.addAttribute("money", userN.getUserMoney());
+        
+        if (principal != null) { 
+	        model.addAttribute("username", principal.getName());
+	        model.addAttribute("isLoggedIn", true);
+	    } else {  
+	        model.addAttribute("isLoggedIn", false);
+	    }
+		
+        User user = userService.SearchByUsername(principal.getName());
+        model.addAttribute("userStatus", user.getUserStatus());
+        
         return "games/blackjack-index"; 
     }
     

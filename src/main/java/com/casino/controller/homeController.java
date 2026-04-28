@@ -12,6 +12,7 @@ import com.casino.services.UsersService;
 
 @Controller
 public class homeController {
+	
 	@Autowired
 	UsersService usersService;
 
@@ -25,10 +26,11 @@ public class homeController {
 	    }
 		
 		User user = usersService.SearchByUsername(principal.getName());
-        model.addAttribute("userStatus", user.getStatuses());
+        model.addAttribute("userStatus", user.getUserStatus());
 		
         return "home";
     }
 	
 }
+
 
