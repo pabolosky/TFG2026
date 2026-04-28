@@ -2,6 +2,7 @@ package com.casino.controller;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,24 +12,30 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.casino.model.User;
+import com.casino.model.rouletteBet;
 import com.casino.model.BlackJack.BlackJackGame;
 import com.casino.repository.UsersRepository;
 import com.casino.services.UsersService;
 import com.casino.services.blackJackService;
 import com.casino.services.plinkoService;
+import com.casino.services.rouletteService;
 import com.casino.services.slotsService;
 
 import jakarta.servlet.http.HttpSession;
 
 
 @Controller
-@RequestMapping(value = "/games")
+@RequestMapping("/games")
 public class gamesController {
+	
+	@Autowired
+    private rouletteService rouletteService;
 	
 	@Autowired
 	private UsersRepository userRepository;
@@ -50,10 +57,19 @@ public class gamesController {
 		return "games/poker";
 	}
 	
+/******************************************************ROULETTE**********************************************************/	
+	
 	@GetMapping("/roulette")
 	public String mostrarRuleta(Model model) {
-		
-		return "games/roulette";
+		 
+		return "games/roulette";  
+	}
+	
+	@PostMapping("/roulette/spin")
+	@ResponseBody
+	public Map<String, Object> spinRoulette(@RequestBody Map<String, List<rouletteBet>> apuesta){
+		List<rouletteBet> apuestas = apuesta.get("apuestas");   
+	    return rouletteService.girar(apuestas);
 	}
 	
 /********************************************************SLOTS********************************************************/
@@ -117,7 +133,7 @@ public class gamesController {
     public String blackjackIndex(Model model, Principal principal) {
         User user = userRepository.findByUsername(principal.getName());
         model.addAttribute("money", user.getUserMoney());
-        return "games/blackjack-index";
+        return "games/blackjack-index"; 
     }
     
     @GetMapping("/blackjack/play")
@@ -136,7 +152,7 @@ public class gamesController {
         model.addAttribute("playerScore", bjService.calculateScore(game.getPlayerHand()));
         
         return "games/blackjack"; 
-    }
+    } 
 
 
     @PostMapping("/blackjack/start")

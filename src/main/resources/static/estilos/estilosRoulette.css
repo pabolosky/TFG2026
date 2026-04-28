@@ -1,0 +1,210 @@
+:root {
+    --casino-black: #0f0f0f;
+    --casino-dark-grey: #1a1a1a;
+    --casino-red: #e6192e;
+    --casino-gold: #ffc107;
+    --casino-green: #27ae60;
+    --casino-blue: #2980b9;
+}
+
+body {
+    margin: 0;
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    background-color: var(--casino-black);
+    color: white;
+    text-align: center;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+}
+ 
+h1 {
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    color: white;
+    border-bottom: 3px solid var(--casino-red);
+    display: inline-block;
+    padding-bottom: 10px;
+}
+
+canvas {
+    display: block; 
+    margin: 0 auto; 
+    max-width: 100%; 
+    background: radial-gradient(circle, #2a2a2a 0%, #1a1a1a 100%);
+    border-radius: 50%;
+    border: 8px solid #333;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+/* Asegúrate de que el contenedor también esté ayudando */
+.roulette-wrapper {
+    width: fit-content;    /* Se ajusta al tamaño del canvas */
+    margin: 0 auto;       /* Centra el contenedor padre */
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* El número central o indicador de resultado */
+#result-number {
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--casino-gold);
+    text-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+    margin: 15px 0;
+    font-family: 'Monospace', sans-serif;
+}
+
+/* Dashboard de Apuestas Estilo Card */
+#betting-dashboard {
+    background-color: var(--casino-dark-grey);
+    border-top: 4px solid var(--casino-red);
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    padding: 2rem;
+    max-width: 550px;
+    width: 100%;
+    margin: 20px auto;
+}
+
+.bet-group {
+    margin-bottom: 25px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.bet-group label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 12px;
+    display: block;
+    font-weight: 600;
+}
+
+/* Cuadrados de apuesta */
+.bet-grid-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.bet-square {
+    flex: 1;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.bet-square:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.2);
+}
+
+.bet-square.active {
+    border-color: white;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+/* Colores específicos */
+.red { background-color: var(--casino-red); }
+.black { background-color: #111; border: 1px solid #333; }
+.blue { background-color: var(--casino-blue); }
+.green { background-color: var(--casino-green); }
+
+/* Sliders de apuesta */
+.slider-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bet-slider {
+    width: 100%;
+    accent-color: var(--casino-red);
+    cursor: pointer;
+}
+
+.amount-display {
+    color: var(--casino-gold);
+    font-weight: bold;
+}
+
+/* Input de número específico */
+#specific-number {
+    width: 100%;
+    background: #0f0f0f;
+    border: 1px solid #444;
+    color: var(--casino-gold);
+    padding: 12px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Botón de Girar */
+#spin-btn {
+    background: linear-gradient(135deg, var(--casino-red) 0%, #a31120 100%);
+    border: none;
+    color: white;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 18px 60px;
+    letter-spacing: 2px;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 20px rgba(230, 25, 46, 0.3);
+}
+
+#spin-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(230, 25, 46, 0.5);
+}
+
+#spin-btn:disabled {
+    background: #444;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Mensajes de Estado */
+#status-msg {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #aaa;
+    min-height: 1.5em;
+}
+
+/* Animación de "Ganaste" */
+.win-flash {
+    animation: winPulse 0.5s infinite alternate;
+}
+
+@keyframes winPulse {
+    from { color: var(--casino-gold); text-shadow: 0 0 10px var(--casino-gold); }
+    to { color: white; text-shadow: 0 0 20px var(--casino-gold); }
+} 

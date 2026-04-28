@@ -1,14 +1,76 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="UTF-8">
-<title>Home</title>
-</head>
-<body>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-    <div class="logo">
-        <a th:href="@{/}"><img src="../logo.png" alt="Logo"></a>
+<head>
+    <meta charset="UTF-8">
+    <title>Roulette - Casino</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/estilos/estilosRoulette.css}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<body th:style="'background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.85)), url(' + @{/img/bg.jpg} + ') no-repeat center center fixed; background-size: cover;'">
+
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <div class="container d-flex flex-column align-items-center justify-content-start pt-4">
+
+        <div id="betting-dashboard">
+            <h1>Roulette</h1>
+            <canvas id="roulette-canvas" width="350" height="350"></canvas>
+            <br>
+            <button id="spin-btn" onclick="spinWheel()">Girar</button>
+            <div id="result-number">-</div>
+            <div id="status-msg">Haz clic para girar</div>
+
+            <div class="bet-group" data-category="color">
+                <div class="bet-grid-row">
+                    <div class="bet-square red" id="colour" data-value="red">ROJO</div>
+                    <div class="bet-square black" id="colour" data-value="black">NEGRO</div>
+                </div>
+                <div class="slider-wrapper">
+                    <label>Apuesta Color: <strong>$<span class="amount-display">0</span></strong></label>
+                    <input type="range" class="bet-slider" min="0" max="1000" step="10" value="0">
+                </div>
+            </div>
+            <div class="bet-group" data-category="parity">
+                <div class="bet-grid-row">
+                    <div class="bet-square blue" id="parity" data-value="even">PAR</div>
+                    <div class="bet-square blue" id="parity" data-value="odd">IMPAR</div>
+                </div>
+                <div class="slider-wrapper">
+                    <label>Apuesta Paridad: <strong>$<span class="amount-display">0</span></strong></label>
+                    <input type="range" class="bet-slider" min="0" max="1000" step="10" value="0">
+                </div>
+            </div>
+
+            <div class="bet-group" data-category="range">
+                <div class="bet-grid-row">
+                    <div class="bet-square green" id="range" data-value="1-18">1-18</div>
+                    <div class="bet-square green" id="range" data-value="19-36">19-36</div>
+                </div>
+                <div class="slider-wrapper">
+                    <label>Apuesta Rango: <strong>$<span class="amount-display">0</span></strong></label>
+                    <input type="range" class="bet-slider" min="0" max="1000" step="10" value="0">
+                </div>
+            </div>
+
+            <div class="bet-group" data-category="single-number">
+                <div class="special-input-row">
+                    <input type="number" id="specific-number" min="0" max="36" placeholder="Nº (0-36)">
+                </div>
+                <div class="slider-wrapper">
+                    <label>Apuesta al Número: <strong>$<span class="amount-display">0</span></strong></label>
+                    <input type="range" class="bet-slider" min="0" max="1000" step="10" value="0">
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script th:src="@{/scripts/dropdownMenus.js}"></script>
+    <script th:src="@{/scripts/roulette.js}"></script>
 </body>
 </html>

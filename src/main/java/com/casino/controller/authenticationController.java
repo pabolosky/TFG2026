@@ -9,6 +9,7 @@ import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.casino.model.Statuses;
 import com.casino.model.User;
 import com.casino.services.UsersService;
+import com.example.demo.model.dept;
 
 import jakarta.servlet.http.HttpServletRequest; 
 
@@ -44,9 +46,10 @@ public class authenticationController {
 		String PlainPwd = user.getUserPassword();
 		String EncodedPwd = passwordEncoder.encode(PlainPwd);
 		user.setUserPassword(EncodedPwd);
-		user.setUserStatus(1);
+		user.setUserStatus(3);
 		user.setRegisterDate(new Date());
 		user.setUserMoney(1000);
+		user.setActive(true);
 		
 		List<Statuses> roles = new ArrayList<>();
 		Statuses defaultStatus = new Statuses();
@@ -70,6 +73,29 @@ public class authenticationController {
 		SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 		logoutHandler.logout(request, null, null);
 		return "redirect:/";
+	}    	 
+	
+	@GetMapping("usersList")
+	public String userList(Model model) {
+		List<User> lista = usersService.SearchAll();
+		model.addAttribute("users", lista);
+		return "authentication/usersList";
+	}
+	
+	@GetMapping("/usersList/activar/{id}")
+	public String activateUser(@PathVariable("id") int id) {
+	    User user = usersService.SearchById(id);
+	    user.setActive(true);
+	    usersService.Save(user);
+	    return "redirect:/authentication/usersList"; 
+	}
+
+	@GetMapping("/usersList/desactivar/{id}")
+	public String desactivarUsuario(@PathVariable("id") int id) {
+	    User user = usersService.SearchById(id);
+	    user.setActive(false);
+	    usersService.Save(user);
+	    return "redirect:/authentication/usersList";
 	}
 	
 	@InitBinder

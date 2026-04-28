@@ -3,61 +3,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLINKO — Casino</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Casino - Plinko</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --gold: #F5C842; --gold-dark: #C9982A; --bg: #0a0a0f;
-            --surface: #13131c; --surface2: #1c1c2a; --border: #2a2a3d;
-            --text: #f0eee8; --muted: #7a7890; --red: #e84040; --green: #3ecf72;
+            --casino-black: #0f0f0f;
+            --casino-dark-grey: #1a1a1a;
+            --casino-red: #e6192e;
+            --casino-gold: #ffc107;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-        .top-bar { width: 100%; height: 100px; background: #000; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-bottom: 1px solid var(--border); }
-        .nav-title { font-family: 'Bebas Neue', sans-serif; color: var(--gold); font-size: 32px; letter-spacing: 4px; }
-        .saldo-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 99px; padding: 10px 24px; display: flex; align-items: center; gap: 10px; }
-        .saldo-chip strong { font-size: 22px; color: var(--gold); }
-        .bump { animation: bumpAnim 0.4s ease; }
-        @keyframes bumpAnim { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
-        .page { display: flex; flex-direction: column; align-items: center; padding: 48px 24px; gap: 32px; }
-        .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 6px; color: var(--gold); }
-        .machine { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px; width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 24px; align-items: center; }
-        canvas { border-radius: 14px; border: 1px solid var(--border); background: var(--bg); display: block; }
-        .multipliers { display: flex; gap: 6px; width: 100%; }
-        .mult-box { flex: 1; text-align: center; padding: 8px 2px; border-radius: 8px; font-family: 'Bebas Neue', sans-serif; font-size: 14px; border: 1px solid; transition: transform 0.2s, box-shadow 0.2s; }
-        .bet-display { background: var(--surface2); border: 1px solid var(--border); padding: 10px; border-radius: 10px; color: var(--gold); font-family: 'Bebas Neue', sans-serif; font-size: 20px; min-width: 80px; text-align: center; }
-        .spin-btn { width: 100%; padding: 16px; background: var(--gold); border: none; border-radius: 14px; font-family: 'Bebas Neue', sans-serif; font-size: 24px; cursor: pointer; transition: 0.2s; }
-        .spin-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
-        .result-msg { padding: 12px; border-radius: 10px; font-weight: bold; text-align: center; min-height: 45px; width: 100%; display: none; }
+
+        body {
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .game-card {
+            background-color: var(--casino-dark-grey);
+            border-top: 4px solid var(--casino-red);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            padding: 2.5rem;
+            max-width: 560px;
+            width: 90%;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        .balance-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+        .balance-box.bump {
+            animation: bumpAnim 0.4s ease;
+        }
+        @keyframes bumpAnim {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 193, 7, 0.4); }
+            100% { transform: scale(1); }
+        }
+        .gold-text {
+            color: var(--casino-gold);
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
+        }
+
+        .board-wrapper {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: center;
+        }
+        canvas {
+            border-radius: 8px;
+            display: block;
+        }
+
+        .multipliers {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 18px;
+        }
+        .mult-box {
+            flex: 1;
+            text-align: center;
+            padding: 7px 2px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .bet-section label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .bet-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .bet-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--casino-red);
+        }
+        .bet-display {
+            background: #2b2b2b;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 8px 14px;
+            color: var(--casino-gold);
+            font-weight: 700;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .bet-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .bet-btn {
+            flex: 1;
+            min-width: 55px;
+            padding: 9px 4px;
+            background: #2b2b2b;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .bet-btn:hover {
+            background: var(--casino-red);
+            border-color: var(--casino-red);
+            box-shadow: 0 0 10px rgba(230, 25, 46, 0.4);
+        }
+        .bet-btn.active {
+            background: var(--casino-gold);
+            color: black;
+            border-color: var(--casino-gold);
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+
+        .btn-drop {
+            background: linear-gradient(135deg, var(--casino-red) 0%, #a31120 100%);
+            border: none;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 15px;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            border-radius: 6px;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .btn-drop:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(230, 25, 46, 0.4);
+            filter: brightness(1.1);
+        }
+        .btn-drop:disabled {
+            background: #444;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .result-msg {
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 16px;
+            display: none;
+            font-size: 0.95rem;
+        }
         .result-msg.show { display: block; }
-        .ganaste { background: rgba(62,207,114,0.2); color: var(--green); border: 1px solid var(--green); }
-        .perdiste { background: rgba(232,64,64,0.2); color: var(--red); border: 1px solid var(--red); }
+        .ganaste {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+        .perdiste {
+            background: rgba(230, 25, 46, 0.15);
+            color: var(--casino-red);
+            border: 1px solid var(--casino-red);
+        }
+
+        .bg-icon {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            font-size: 120px;
+            color: rgba(255, 255, 255, 0.03);
+            pointer-events: none;
+        }
     </style>
 </head>
-<body>
-    <div class="top-bar">
-        <div class="logo"><a th:href="@{/}"><span class="nav-title">🎰 CASINO</span></a></div>
-        <div class="saldo-chip" id="saldo-chip">
-            💰 SALDO ACTUAL: <strong><span id="saldo-val">0</span> €</strong>
+
+<body th:style="'background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.85)), url(' + @{/img/bg.jpg} + ') no-repeat center center fixed; background-size: cover;'">
+
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <div class="container d-flex flex-column align-items-center justify-content-start pt-4">
+
+        <div class="game-card position-relative overflow-hidden">
+            <span class="material-symbols-outlined bg-icon">featured_play_list</span>
+
+            <div class="text-center mb-4">
+                <span class="material-symbols-outlined" style="color: var(--casino-gold); font-size: 48px;">lens</span>
+                <h4 class="mt-2 fw-bold">PLINKO</h4>
+            </div>
+
+            <div class="balance-box text-center" id="balance-box">
+                <small class="text-uppercase text-secondary d-block mb-1">Tu Crédito Disponible</small>
+                <h3 class="gold-text mb-0"><span id="saldo-val">0</span> €</h3>
+            </div>
+
+            <div class="board-wrapper">
+                <canvas id="plinko-canvas" width="460" height="310"></canvas>
+            </div>
+
+            <div class="multipliers" id="mult-boxes"></div>
+
+            <div id="result-msg" class="result-msg"></div>
+
+            <div class="bet-section mt-2">
+                <label>Cantidad a Apostar</label>
+                <div class="bet-row">
+                    <input type="range" id="slider-apuesta" min="10" max="1000" step="10" value="50"
+                           oninput="setApuesta(this.value)">
+                    <div class="bet-display" id="display-apuesta">50 €</div>
+                </div>
+                <div class="bet-buttons">
+                    <button type="button" class="bet-btn" data-value="10">10</button>
+                    <button type="button" class="bet-btn" data-value="25">25</button>
+                    <button type="button" class="bet-btn" data-value="50">50</button>
+                    <button type="button" class="bet-btn" data-value="100">100</button>
+                    <button type="button" class="bet-btn" data-value="250">250</button>
+                    <button type="button" class="bet-btn" data-value="500">500</button>
+                </div>
+            </div>
+
+            <button class="btn-drop d-flex align-items-center justify-content-center gap-2"
+                    id="drop-btn" onclick="soltar()">
+                <span class="material-symbols-outlined">lens</span>
+                Soltar Bola
+            </button>
+
+            <div class="text-center mt-4">
+                <a th:href="@{/}" class="text-secondary text-decoration-none small">
+                    <span class="material-symbols-outlined align-middle fs-6">arrow_back</span>
+                    Volver al Lobby
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="page">
-        <h1 class="page-title">Plinko</h1>
-        <div class="machine">
-            <canvas id="plinko-canvas" width="440" height="340"></canvas>
-            <div class="multipliers" id="mult-boxes"></div>
-            <div id="result-msg" class="result-msg"></div>
-            <div style="width:100%">
-                <p style="color:var(--muted); margin-bottom:10px; font-size:12px; text-transform:uppercase">Tu Apuesta</p>
-                <div style="display:flex; gap:10px; align-items:center">
-                    <input type="range" id="slider-apuesta" min="10" max="1000" step="10" value="50" style="flex:1" oninput="setApuesta(this.value)">
-                    <div class="bet-display" id="display-apuesta">50 €</div>
-                </div>
-            </div>
-            <button class="spin-btn" id="drop-btn" onclick="soltar()">SOLTAR BOLA</button>
-        </div>
-    </div>
+    <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
 
     <script th:inline="javascript">
         let saldo = [[${saldo}]];
@@ -65,46 +271,56 @@
         let cayendo = false;
 
         const MULTIPLIERS = [10, 3, 1.5, 0.5, 0.3, 0.5, 1.5, 3, 10];
-        const MULT_COLORS = [
-            {bg:'rgba(62,207,114,0.25)',border:'#3ecf72',text:'#3ecf72'},
-            {bg:'rgba(245,200,66,0.2)',border:'#F5C842',text:'#F5C842'},
-            {bg:'rgba(245,200,66,0.15)',border:'#C9982A',text:'#C9982A'},
-            {bg:'rgba(232,64,64,0.15)',border:'#e84040',text:'#e84040'},
-            {bg:'rgba(122,120,144,0.2)',border:'#7a7890',text:'#7a7890'},
-            {bg:'rgba(232,64,64,0.15)',border:'#e84040',text:'#e84040'},
-            {bg:'rgba(245,200,66,0.15)',border:'#C9982A',text:'#C9982A'},
-            {bg:'rgba(245,200,66,0.2)',border:'#F5C842',text:'#F5C842'},
-            {bg:'rgba(62,207,114,0.25)',border:'#3ecf72',text:'#3ecf72'},
+        const MULT_STYLES = [
+            { bg: 'rgba(40,167,69,0.2)',   border: '#28a745', text: '#28a745' },
+            { bg: 'rgba(255,193,7,0.2)',    border: '#ffc107', text: '#ffc107' },
+            { bg: 'rgba(255,193,7,0.12)',   border: '#c79a00', text: '#c79a00' },
+            { bg: 'rgba(230,25,46,0.15)',   border: '#e6192e', text: '#e6192e' },
+            { bg: 'rgba(100,100,100,0.2)',  border: '#666',    text: '#888'    },
+            { bg: 'rgba(230,25,46,0.15)',   border: '#e6192e', text: '#e6192e' },
+            { bg: 'rgba(255,193,7,0.12)',   border: '#c79a00', text: '#c79a00' },
+            { bg: 'rgba(255,193,7,0.2)',    border: '#ffc107', text: '#ffc107' },
+            { bg: 'rgba(40,167,69,0.2)',   border: '#28a745', text: '#28a745' },
         ];
 
         const COLS = 9, ROWS = 8;
         const canvas = document.getElementById('plinko-canvas');
         const ctx = canvas.getContext('2d');
         const W = canvas.width, H = canvas.height;
-        const padX = 44, padY = 32;
-        const cellW = (W - padX*2) / (COLS - 1);
-        const cellH = (H - padY*2 - 50) / (ROWS - 1);
+        const padX = 46, padY = 28;
+        const cellW = (W - padX * 2) / (COLS - 1);
+        const cellH = (H - padY * 2 - 48) / (ROWS - 1);
 
         document.addEventListener('DOMContentLoaded', () => {
             setSaldo(saldo);
             setApuesta(50);
             buildMults();
             drawBoard(null, undefined);
+
+            document.querySelectorAll('.bet-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const val = parseInt(this.dataset.value);
+                    setApuesta(val);
+                    document.getElementById('slider-apuesta').value = val;
+                    document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
         });
 
         function buildMults() {
-            const box = document.getElementById('mult-boxes');
-            box.innerHTML = '';
+            const container = document.getElementById('mult-boxes');
+            container.innerHTML = '';
             MULTIPLIERS.forEach((m, i) => {
-                const c = MULT_COLORS[i];
+                const s = MULT_STYLES[i];
                 const d = document.createElement('div');
                 d.className = 'mult-box';
                 d.id = 'mult-' + i;
-                d.style.background = c.bg;
-                d.style.borderColor = c.border;
-                d.style.color = c.text;
+                d.style.background = s.bg;
+                d.style.borderColor = s.border;
+                d.style.color = s.text;
                 d.textContent = m + 'x';
-                box.appendChild(d);
+                container.appendChild(d);
             });
         }
 
@@ -116,109 +332,110 @@
 
         function drawBoard(ball, highlightSlot) {
             ctx.clearRect(0, 0, W, H);
+
             for (let row = 0; row < ROWS; row++) {
                 const count = row + 2;
                 for (let col = 0; col < count; col++) {
                     const p = pinPosition(row, col);
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-                    ctx.fillStyle = '#2a2a3d';
+                    ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#111';
                     ctx.fill();
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
-                    ctx.fillStyle = '#7a7890';
+                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = '#555';
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(p.x - 1, p.y - 1, 1.5, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
                     ctx.fill();
                 }
             }
+
             if (highlightSlot !== undefined) {
                 const slotW = (W - padX * 2) / COLS;
                 const sx = padX + highlightSlot * slotW;
-                const sy = H - 50;
-                ctx.fillStyle = MULT_COLORS[highlightSlot].border + '44';
-                ctx.roundRect(sx, sy - 8, slotW, 48, 6);
-                ctx.fill();
+                const sy = H - 46;
+                ctx.fillStyle = MULT_STYLES[highlightSlot].border + '33';
+                if (ctx.roundRect) {
+                    ctx.beginPath();
+                    ctx.roundRect(sx, sy - 6, slotW, 44, 6);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(sx, sy - 6, slotW, 44);
+                }
             }
+
             if (ball) {
                 ctx.beginPath();
-                ctx.arc(ball.x, ball.y, 11, 0, Math.PI * 2);
-                ctx.fillStyle = '#F5C842';
+                ctx.arc(ball.x + 2, ball.y + 2, 11, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
                 ctx.fill();
+                const grad = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 2, ball.x, ball.y, 11);
+                grad.addColorStop(0, '#ffe066');
+                grad.addColorStop(0.6, '#ffc107');
+                grad.addColorStop(1, '#b8860b');
                 ctx.beginPath();
-                ctx.arc(ball.x - 3, ball.y - 3, 4, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.arc(ball.x, ball.y, 11, 0, Math.PI * 2);
+                ctx.fillStyle = grad;
                 ctx.fill();
             }
         }
 
-       function animateBall(finalSlot, onDone) {
-    // Reconstruir el camino binomial que lleva al finalSlot
-    // finalSlot = número de veces que fue a la derecha (0-8)
-    let rights = finalSlot; // cuántas veces va a la derecha
-    let lefts = 8 - finalSlot;
+        function animateBall(finalSlot, onDone) {
+            let rights = finalSlot;
+            let steps = Array(rights).fill(1).concat(Array(8 - rights).fill(0));
+            for (let i = steps.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [steps[i], steps[j]] = [steps[j], steps[i]];
+            }
 
-    // Mezclar aleatoriamente los pasos para que la animación varíe
-    let steps = Array(rights).fill(1).concat(Array(lefts).fill(0));
-    for (let i = steps.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [steps[i], steps[j]] = [steps[j], steps[i]];
-    }
+            let path = [{ x: W / 2, y: padY - 22 }];
+            let col = 0;
+            for (let row = 0; row < ROWS; row++) {
+                const goRight = steps[row] === 1;
+                const p = pinPosition(row, col);
+                path.push({ x: p.x, y: p.y });
+                if (goRight) col++;
+            }
+            const slotW = (W - padX * 2) / COLS;
+            path.push({ x: padX + finalSlot * slotW + slotW / 2, y: H - 28 });
 
-    let path = [{ x: W / 2, y: padY - 24 }];
-    let col = 0; // columna dentro de la fila actual (empieza en el pin izquierdo de cada fila)
+            let step = 0, sub = 0;
+            const stepsPerSeg = 18;
 
-    for (let row = 0; row < ROWS; row++) {
-        const goRight = steps[row] === 1;
-        const p = pinPosition(row, col);
-
-        // Punto de rebote en el pin
-        path.push({ x: p.x, y: p.y });
-
-        // Mover columna para la siguiente fila
-        if (goRight) col++;
-        // col no cambia si va a la izquierda
-    }
-
-    // Destino final: centro del slot
-    const slotW = (W - padX * 2) / COLS;
-    path.push({ x: padX + finalSlot * slotW + slotW / 2, y: H - 28 });
-
-    let step = 0, sub = 0;
-    const stepsPerSeg = 18;
-
-    function frame() {
-        if (step >= path.length - 1) { onDone(); return; }
-        sub++;
-        const t = sub / stepsPerSeg;
-        const from = path[step], to = path[step + 1];
-
-        // Easing suave + pequeño arco lateral para simular rebote
-        const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-        const arc = Math.sin(Math.PI * t) * 8;
-        const ball = {
-            x: from.x + (to.x - from.x) * ease + arc * (to.x > from.x ? 1 : -1),
-            y: from.y + (to.y - from.y) * ease
-        };
-
-        drawBoard(ball, step >= path.length - 2 ? finalSlot : undefined);
-        if (sub >= stepsPerSeg) { step++; sub = 0; }
-        requestAnimationFrame(frame);
-    }
-    frame();
-}
+            function frame() {
+                if (step >= path.length - 1) { onDone(); return; }
+                sub++;
+                const t = sub / stepsPerSeg;
+                const from = path[step], to = path[step + 1];
+                const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+                const arc = Math.sin(Math.PI * t) * 8;
+                const ball = {
+                    x: from.x + (to.x - from.x) * ease + arc * (to.x > from.x ? 1 : -1),
+                    y: from.y + (to.y - from.y) * ease
+                };
+                drawBoard(ball, step >= path.length - 2 ? finalSlot : undefined);
+                if (sub >= stepsPerSeg) { step++; sub = 0; }
+                requestAnimationFrame(frame);
+            }
+            frame();
+        }
 
         function setSaldo(val) {
             saldo = parseInt(val);
             document.getElementById('saldo-val').textContent = saldo;
-            const chip = document.getElementById('saldo-chip');
-            chip.classList.remove('bump');
-            void chip.offsetWidth;
-            chip.classList.add('bump');
+            const box = document.getElementById('balance-box');
+            box.classList.remove('bump');
+            void box.offsetWidth;
+            box.classList.add('bump');
             actualizarBoton();
         }
 
         function setApuesta(val) {
             apuesta = parseInt(val);
             document.getElementById('display-apuesta').textContent = apuesta + ' €';
+            document.getElementById('slider-apuesta').value = apuesta;
             actualizarBoton();
         }
 
@@ -249,21 +466,26 @@
             })
             .then(r => r.json())
             .then(data => {
-                if (!data.ok) { alert('Error: ' + data.error); cayendo = false; actualizarBoton(); return; }
+                if (!data.ok) {
+                    alert('Error: ' + data.error);
+                    cayendo = false;
+                    actualizarBoton();
+                    return;
+                }
 
                 animateBall(data.slot, () => {
                     const box = document.getElementById('mult-' + data.slot);
-                    box.style.transform = 'scale(1.2)';
-                    box.style.boxShadow = '0 0 16px ' + MULT_COLORS[data.slot].border;
+                    box.style.transform = 'scale(1.25)';
+                    box.style.boxShadow = '0 0 14px ' + MULT_STYLES[data.slot].border;
                     setTimeout(() => { box.style.transform = ''; box.style.boxShadow = ''; }, 1200);
 
                     setSaldo(data.saldo);
                     msg.classList.add('show');
                     if (data.premio > 0) {
-                        msg.textContent = `¡GANASTE! +${data.premio} €  (×${MULTIPLIERS[data.slot]})`;
+                        msg.textContent = '¡GANASTE! +' + data.premio + ' €  (×' + MULTIPLIERS[data.slot] + ')';
                         msg.classList.add('ganaste');
                     } else {
-                        msg.textContent = `PERDISTE. ${data.premio} €`;
+                        msg.textContent = 'PERDISTE. ' + data.premio + ' €';
                         msg.classList.add('perdiste');
                     }
                     cayendo = false;
@@ -278,6 +500,6 @@
         }
     </script>
 
-    <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

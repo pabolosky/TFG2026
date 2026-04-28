@@ -123,25 +123,28 @@
         
         <div class="menu-center" id="menu-juegos">
             <span class="menu-title">
-                {NOMBRE CASINO}
+                WCasino
             </span>
         </div>
         
         <div class="menu-right" id="menu-login">
             <span class="material-symbols-outlined">person</span>
             <ul class="dropdown">
-                <li sec:authorize="isAnonymous()">
+                <li>
                     <a th:href="@{/authentication/register}">Registrarse</a>
                 </li>
-                <li sec:authorize="isAnonymous()">
-                    <a th:href="@{/authentication/loginForm}">Iniciar sesión</a>
+                <li th:if="${isLoggedIn == null or !isLoggedIn}">
+                    <a th:href="@{/authentication/login}">Iniciar sesión</a>
                 </li>
-                <li sec:authorize="isAuthenticated()">
+                <li th:if="${isLoggedIn != null and isLoggedIn}">
                     <form th:action="@{/logout}" method="post" id="logoutForm" style="display:none;"></form>
                     <a href="javascript:void(0)" onclick="document.getElementById('logoutForm').submit();">
                         Cerrar sesión
                     </a>
-                </li>
+                 </li>
+                 <li th:if="${isLoggedIn != null and isLoggedIn and userStatus != 3}">
+                    <a th:href="@{/authentication/usersList}">Lista de usuarios</a>
+                 </li>
             </ul>
         </div>
     </div>

@@ -1,0 +1,138 @@
+:root {
+    --casino-black: #0f0f0f;
+    --casino-dark-grey: #1a1a1a;
+    --casino-red: #e6192e;
+    --casino-gold: #ffc107;
+    --casino-green: #28a745;
+}
+
+body {
+    background-color: var(--casino-black);
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    padding: 40px;
+}
+
+/* Contenedor de la Tabla */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: var(--casino-dark-grey);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    border: 1px solid #333;
+}
+
+/* Encabezados */
+thead {
+    background-color: #111;
+    border-bottom: 3px solid var(--casino-red);
+}
+
+th {
+    padding: 18px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    color: #888;
+    text-align: left;
+}
+
+/* Celdas */
+td {
+    padding: 16px;
+    border-bottom: 1px solid #2a2a2a;
+    font-size: 0.95rem;
+    color: #ddd;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* Efecto Hover en filas */
+tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+    transition: background 0.3s ease;
+}
+
+/* Estilo para los botones de Activar/Modificar */
+button {
+    background: linear-gradient(135deg, var(--casino-red) 0%, #a31120 100%);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230, 25, 46, 0.4);
+    filter: brightness(1.1);
+}
+
+/* Resaltado para el dinero o status */
+td:nth-child(7) { /* Columna de Dinero */
+    color: var(--casino-gold);
+    font-weight: bold;
+}
+
+/* Status: Activo/Inactivo */
+td:nth-child(8) {
+    font-weight: bold;
+}
+.btn-activar, .btn-desactivar {
+    display: inline-block;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 100px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Botón Activar (Verde Casino) */
+.btn-activar {
+    background: linear-gradient(135deg, var(--casino-green) 0%, #1e7e34 100%);
+    color: white;
+}
+
+.btn-activar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    filter: brightness(1.2);
+}
+
+/* Botón Desactivar (Rojo Casino) */
+.btn-desactivar {
+    background: linear-gradient(135deg, var(--casino-red) 0%, #a31120 100%);
+    color: white;
+}
+
+.btn-desactivar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230, 25, 46, 0.4);
+    filter: brightness(1.2);
+}
+
+/* Estado de los textos de status en la tabla */
+.status-active {
+    color: var(--casino-green);
+    text-shadow: 0 0 10px rgba(40, 167, 69, 0.2);
+}
+
+.status-inactive {
+    color: var(--casino-red);
+    text-shadow: 0 0 10px rgba(230, 25, 46, 0.2);
+}

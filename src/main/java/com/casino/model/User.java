@@ -16,15 +16,15 @@ public class User implements Serializable {
 
 	@Column(name="register_date")
 	private Date registerDate;
-
-	@Column(name="user_email")
+  
+	@Column(name="user_email")   
 	private String userEmail;
-
+ 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="user_id")
+	@Column(name="user_id") 
 	private int userId;
-
+    
 	@Column(name="user_password")
 	private String userPassword;
 
@@ -33,6 +33,9 @@ public class User implements Serializable {
 	
 	@Column(name="user_money")
 	private int userMoney;
+	
+	@Column(name="active")
+	private boolean active;
 
 	public int getUserMoney() {
 		return userMoney;
@@ -119,6 +122,14 @@ public class User implements Serializable {
 
 	public void setStatuses(List<Statuses> statuses) {
 		this.statuses = statuses;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }
